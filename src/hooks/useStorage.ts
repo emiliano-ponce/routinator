@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Filesystem, Directory } from '@capacitor/filesystem'
 
-const useStorage = <T>(path: string) => {
+const useStorage = <T>(path: string): [T | null, (value: T) => Promise<void>, boolean] => {
   const [value, setValue] = useState<T | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -14,7 +14,9 @@ const useStorage = <T>(path: string) => {
         path,
         directory: Directory.Data,
       })
-      setValue(JSON.parse(content.data))
+      if (content) {
+        setValue(JSON.parse(content.data))
+      }
       setLoading(false)
     }
     loadSaved()
@@ -28,9 +30,10 @@ const useStorage = <T>(path: string) => {
       directory: Directory.Data,
     })
     setValue(value)
+    setLoading(false)
   }
-  setLoading(false)
-  return [value, save, loading] as const
+  
+  return [value, save, loading]
 }
 
 export default useStorage

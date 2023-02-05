@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import usePreferences from './usePreferences'
 import useStorage from './useStorage'
 
-interface Routine {
+export interface IRoutine {
   id: string
   name: string
   description?: string
@@ -30,16 +30,20 @@ const Day = {
 
 const useRoutine = () => {
   const [routineId, setRoutineId] = usePreferences('routine')
-  const [_routines, setRoutines] = useStorage<Routine[]>('routines')
+  const [_routines, setRoutines] = useStorage<IRoutine[]>('routines')
 
+  const routineRef = useRef<IRoutine | null>(null)
   const routines = useMemo(() => _routines || [], [_routines])
-  const routine = useMemo(() => routines.find((r) => r.id === routineId), [routineId, routines])
 
-  const selectRoutine = (routine: Routine) => {
+  useEffect(() => {
+    routineRef.current = routines?.find((r) => r.id === routineId) ?? null
+  }, [routineId, routines])
+
+  const selectRoutine = (routine: IRoutine) => {
     setRoutineId(routine.id)
   }
 
-  const createRoutine = (routine: Routine) => {
+  const createRoutine = (routine: IRoutine) => {
     setRoutines([...routines, routine])
   }
 
@@ -47,12 +51,12 @@ const useRoutine = () => {
     setRoutines(routines.filter((routine) => routine.id !== id))
   }
 
-  const updateRoutine = (id: string, routine: Routine) => {
+  const updateRoutine = (id: string, routine: IRoutine) => {
     setRoutines(routines.map((r) => (r.id === id ? routine : r)))
   }
 
   return {
-    routine,
+    routine: routineRef?.current,
     routines,
     createRoutine,
     deleteRoutine,

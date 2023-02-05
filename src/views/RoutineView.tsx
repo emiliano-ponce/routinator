@@ -1,6 +1,6 @@
-import { IonItem, IonList } from '@ionic/react'
-import React from 'react'
-import useRoutine from '../hooks/useRoutine'
+import { IonDatetime, IonItem, IonList } from '@ionic/react'
+
+import useRoutine, { IRoutine } from '../hooks/useRoutine'
 
 export interface RoutineViewProps {}
 
@@ -11,27 +11,35 @@ export default function RoutineView(props: RoutineViewProps) {
   return (
     <div>
       {hasRoutines ? (
-        <div>{routine ? <h1>{routine?.name}</h1> : <h1>Select a routine</h1>}</div>
+        <div>{routine ? <Routine routine={routine} /> : <h1>Select a routine</h1>}</div>
       ) : (
-        <div>
-          <h1>No routines</h1>
-        </div>
+        <NoRoutines />
       )}
     </div>
   )
 }
 
-const Routine = () => {
-  const { routine } = useRoutine()
+const NoRoutines = () => {
+  return <div>
+    <h1>No routines</h1>
+    <button onClick={() => alert('clicked!')}>Create New Routine</button>
+  </div>
+}
+
+const Routine = ({ routine }: { routine: IRoutine }) => {
+  const { activities } = routine
 
   return (
-    <IonList>
-      {routine?.activities.map((activity) => (
-        <IonItem key={activity.id}>
-          <h2>{activity.name}</h2>
-          <p>{activity.description}</p>
-        </IonItem>
-      ))}
-    </IonList>
+    <div>
+      <IonDatetime />
+      <IonList>
+        {activities.map(({ id, name, description, days, endTime, startTime }) => (
+          <IonItem key={id}>
+            <h2>{name}</h2>
+            <p>{description}</p>
+          </IonItem>
+        ))}
+      </IonList>
+    </div>
   )
 }

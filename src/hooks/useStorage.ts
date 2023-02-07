@@ -9,15 +9,20 @@ const useStorage = <T>(path: string): [T | null, (value: T) => Promise<void>, bo
 
   useEffect(() => {
     const loadSaved = async () => {
-      setLoading(true)
-      const content = await Filesystem.readFile({
-        path,
-        directory: Directory.Data,
-      })
-      if (content) {
-        setValue(JSON.parse(content.data))
+      try {
+        setLoading(true)
+        const content = await Filesystem.readFile({
+          path,
+          directory: Directory.Data,
+        })
+        if (content) {
+          setValue(JSON.parse(content.data))
+        }
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
     loadSaved()
   }, [path])
@@ -32,7 +37,7 @@ const useStorage = <T>(path: string): [T | null, (value: T) => Promise<void>, bo
     setValue(value)
     setLoading(false)
   }
-  
+
   return [value, save, loading]
 }
 

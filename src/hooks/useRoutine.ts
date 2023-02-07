@@ -15,10 +15,12 @@ export type Activity = {
   endTime: string
   startTime: string
   description?: string
-  days: [typeof Day][]
+  days: Day[]
 }
 
-const Day = {
+export type Day = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
+
+export const Days: { [key: string]: Day } = {
   Sun: 'Sunday',
   Mon: 'Monday',
   Tue: 'Tuesday',
@@ -43,8 +45,11 @@ const useRoutine = () => {
     setRoutineId(routine.id)
   }
 
-  const createRoutine = (routine: IRoutine) => {
+  // Mocking the API
+  const createRoutine = async (routineReq: Omit<IRoutine, 'id'>): Promise<IRoutine> => {
+    const routine = { ...routineReq, id: Math.random().toString(36).substring(2, 9) }
     setRoutines([...routines, routine])
+    return new Promise((resolve) => setTimeout(() => resolve(routine), 1000))
   }
 
   const deleteRoutine = (id: string) => {

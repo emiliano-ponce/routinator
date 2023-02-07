@@ -6,10 +6,13 @@ import { Redirect, Route, RouteComponentProps, StaticContext } from 'react-route
 import AccountTab from '../pages/AccountTab'
 import RoutineTab from '../pages/RoutineTab'
 import SettingsTab from '../pages/SettingsTab'
+import CreateRoutine from '../pages/CreateRoutine'
 
 export const Routes = {
   account: '/account',
   routine: '/routine',
+  createRoutine: '/routine/create',
+  editRoutine: '/routine/edit/:id',
   settings: '/settings',
 } as const
 
@@ -38,17 +41,29 @@ export const routes: IRoute[] = [
     name: 'settings',
     component: SettingsTab,
   },
+  {
+    path: Routes.createRoutine,
+    name: 'createRoutine',
+    component: CreateRoutine,
+  },
+  {
+    path: Routes.editRoutine,
+    name: 'editRoutine',
+    component: CreateRoutine,
+  },
 ]
 
 type TabConfig = {
-  [K in RouteKey]: { label?: string; icon?: string }
+  icon: string
+  label: string
+  path: RoutePath
 }
 
-const tabs: TabConfig = {
-  account: { label: 'Account', icon: personOutline },
-  routine: { label: 'Routine', icon: checkboxOutline },
-  settings: { label: 'Settings', icon: settingsOutline },
-}
+const tabs: TabConfig[] = [
+  { label: 'Account', icon: personOutline, path: Routes.account },
+  { label: 'Routine', icon: checkboxOutline, path: Routes.routine },
+  { label: 'Settings', icon: settingsOutline, path: Routes.settings },
+]
 
 const Router = () => {
   return (
@@ -62,11 +77,10 @@ const Router = () => {
           <Redirect exact from="/" to="/routine" />
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
-          {routes.map((route) => {
-            const { path, name } = route
-            const { icon, label } = tabs[name]
+          {tabs.map((tab) => {
+            const { icon, label, path } = tab
             return (
-              <IonTabButton key={name} tab={name} href={path}>
+              <IonTabButton key={label} tab={label} href={path}>
                 <IonIcon icon={icon} />
                 <IonLabel>{label}</IonLabel>
               </IonTabButton>
